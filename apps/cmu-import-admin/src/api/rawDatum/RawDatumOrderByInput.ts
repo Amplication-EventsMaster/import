@@ -1,0 +1,33 @@
+import { SortOrder } from "../../util/SortOrder";
+
+export type RawDatumOrderByInput = {
+  advisor?: SortOrder;
+  ai?: SortOrder;
+  alg?: SortOrder;
+  comments?: SortOrder;
+  csys?: SortOrder;
+  el?: SortOrder;
+  finish?: SortOrder;
+  fullRecord?: SortOrder;
+  id?: SortOrder;
+  leftProgram?: SortOrder;
+  name?: SortOrder;
+  notes?: SortOrder;
+  pl?: SortOrder;
+  programmingReq?: SortOrder;
+  qualdone?: SortOrder;
+  sex?: SortOrder;
+  speakingReq?: SortOrder;
+  ss?: SortOrder;
+  startSem?: SortOrder;
+  startYear?: SortOrder;
+  startYearFull?: SortOrder;
+  teachingReq?: SortOrder;
+  thesisCommittee?: SortOrder;
+  thesisProposal?: SortOrder;
+  thesisTitle?: SortOrder;
+  undergrad?: SortOrder;
+  writingReq?: SortOrder;
+  year?: SortOrder;
+  yearFull?: SortOrder;
+};

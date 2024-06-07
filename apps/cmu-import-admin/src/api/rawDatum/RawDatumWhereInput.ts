@@ -1,0 +1,36 @@
+import { StringNullableFilter } from "../../util/StringNullableFilter";
+import { IntFilter } from "../../util/IntFilter";
+import { IntNullableFilter } from "../../util/IntNullableFilter";
+import { FloatNullableFilter } from "../../util/FloatNullableFilter";
+
+export type RawDatumWhereInput = {
+  advisor?: StringNullableFilter;
+  ai?: StringNullableFilter;
+  alg?: StringNullableFilter;
+  comments?: StringNullableFilter;
+  csys?: StringNullableFilter;
+  el?: StringNullableFilter;
+  finish?: StringNullableFilter;
+  fullRecord?: StringNullableFilter;
+  id?: IntFilter;
+  leftProgram?: StringNullableFilter;
+  name?: StringNullableFilter;
+  notes?: StringNullableFilter;
+  pl?: StringNullableFilter;
+  programmingReq?: StringNullableFilter;
+  qualdone?: StringNullableFilter;
+  sex?: StringNullableFilter;
+  speakingReq?: StringNullableFilter;
+  ss?: StringNullableFilter;
+  startSem?: StringNullableFilter;
+  startYear?: IntNullableFilter;
+  startYearFull?: StringNullableFilter;
+  teachingReq?: StringNullableFilter;
+  thesisCommittee?: StringNullableFilter;
+  thesisProposal?: StringNullableFilter;
+  thesisTitle?: StringNullableFilter;
+  undergrad?: StringNullableFilter;
+  writingReq?: StringNullableFilter;
+  year?: FloatNullableFilter;
+  yearFull?: StringNullableFilter;
+};
