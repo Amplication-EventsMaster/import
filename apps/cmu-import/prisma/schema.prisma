@@ -1,0 +1,1638 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Advisor {
+  date        DateTime     @db.Date
+  facultyId   Int?         @map("faculty_id")
+  id          Int          @id @default(autoincrement()) @map("advisor_id")
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([facultyId], map: "faculty_id")
+  @@index([student_id], map: "student_id")
+  @@map("advisors")
+}
+
+model AdvisorsCopy {
+  date      DateTime @db.Date
+  facultyId Int?     @map("faculty_id")
+  id        Int      @id @default(autoincrement()) @map("advisor_id")
+  studentId Int      @map("student_id")
+
+  @@index([facultyId], map: "faculty_id")
+  @@index([studentId], map: "student_id")
+  @@map("advisors_copy")
+}
+
+model AgendaItem {
+  agendaId  Int @map("agenda_id")
+  id        Int @id @default(autoincrement()) @map("agitem_id")
+  meetingId Int @map("meeting_id")
+  order     Int
+
+  @@map("agenda_items")
+}
+
+model Agenda {
+  department       String  @db.Char(20)
+  id               Int     @id @default(autoincrement()) @map("agenda_id")
+  longDescription  String? @map("long_description") @db.VarChar(1000)
+  shortDescription String  @map("short_description") @db.VarChar(100)
+
+  @@map("agendas")
+}
+
+model ApplywebApplication {
+  dateSubmitted              DateTime  @map("date_submitted") @db.Date
+  id                         Int       @id @default(autoincrement()) @map("applyweb_application_id")
+  pier                       String?   @db.Char(1)
+  resumeFilepath             String?   @map("resume_filepath") @db.VarChar(255)
+  statementOfPurposeFilepath String?   @map("statement_of_purpose_filepath") @db.VarChar(255)
+  studentCitizenshipCountry  String?   @map("student_citizenship_country") @db.VarChar(50)
+  studentDateOfBirth         DateTime? @map("student_date_of_birth") @db.Date
+  studentEthnicity           String?   @map("student_ethnicity") @db.VarChar(50)
+  studentGender              String?   @map("student_gender") @db.Char(1)
+  studentNameFirst           String?   @map("student_name_first") @db.VarChar(50)
+  studentNameLast            String?   @map("student_name_last") @db.VarChar(50)
+  studentTitle               String?   @map("student_title") @db.VarChar(20)
+  womenFellowship            String?   @map("women_fellowship") @db.Char(1)
+
+  @@map("applyweb_applications")
+}
+
+model ApplywebStudentMigrationDatum {
+  appId               Int     @map("app_id")
+  applywebDb          String? @map("applyweb_db") @db.VarChar(30)
+  applywebDbUserId    Int?    @map("applyweb_db_user_id")
+  applywebDbUserTable String? @map("applyweb_db_user_table") @db.VarChar(30)
+  id                  String  @id @default(cuid()) @db.VarChar(250)
+
+  @@index([appId], map: "app_id")
+  @@index([appId], map: "fk_applyweb_student_migration_data_applyweb_applications")
+  @@map("applyweb_student_migration_data")
+}
+
+model Area {
+  arank       Int?         @db.UnsignedInt
+  area        String?      @db.VarChar(50)
+  id          Int          @id @default(autoincrement()) @map("area_id")
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([area], map: "area")
+  @@index([arank], map: "rank")
+  @@index([student_id], map: "student_id")
+  @@map("areas")
+}
+
+model Award {
+  awardDate   DateTime?    @map("award_date") @db.DateTime(0)
+  awardName   String?      @map("award_name") @db.VarChar(100)
+  id          Int          @id @default(autoincrement()) @map("award_id") @db.UnsignedInt
+  pending     Boolean?     @default(false)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([id], map: "award_id")
+  @@index([student_id], map: "student_id")
+  @@map("awards")
+}
+
+model BlackfridayApplywebApplication {
+  applywebApplicationId Int @map("applyweb_application_id")
+  id                    Int @id @default(autoincrement()) @map("user_id")
+  studentId             Int @map("student_id")
+
+  @@index([applywebApplicationId], map: "fk_blackfriday_applyweb_applications_applyweb_applications")
+  @@map("blackfriday_applyweb_applications")
+}
+
+model CommitteeService {
+  committeeName String?      @map("committee_name") @db.VarChar(100)
+  endDate       DateTime?    @map("end_date") @db.DateTime(0)
+  id            Int          @id @default(autoincrement()) @map("committee_id") @db.UnsignedInt
+  startDate     DateTime?    @map("start_date") @db.DateTime(0)
+  studentData   StudentDatum @relation(fields: [student_id], references: [id])
+  student_id    Int
+
+  @@index([id], map: "committee_id")
+  @@index([student_id], map: "student_id")
+  @@map("committee_service")
+}
+
+model ContactInformation {
+  address1  String? @db.VarChar(100)
+  address2  String? @db.VarChar(100)
+  city      String? @db.VarChar(100)
+  country   String? @db.VarChar(100)
+  id        Int     @id @default(autoincrement()) @map("contact_information_id")
+  phone     String? @db.VarChar(50)
+  state     String? @db.VarChar(100)
+  studentId Int     @default(0) @map("student_id")
+  zip       String? @db.VarChar(100)
+
+  @@index([studentId], map: "student_id")
+  @@map("contact_information")
+}
+
+model CourseDepartment {
+  courseId        Int     @map("course_id") @db.UnsignedInt
+  id              Int     @id @default(autoincrement()) @map("cd_id") @db.UnsignedInt
+  requirementType String? @map("requirement_type") @db.VarChar(50)
+
+  @@index([courseId], map: "course_id")
+  @@map("course_department")
+}
+
+model Course {
+  courseNum      String? @map("course_num") @db.VarChar(10)
+  courseSection  String? @map("course_section") @db.VarChar(10)
+  department     String? @db.VarChar(20)
+  departmentCode String? @map("department_code") @db.VarChar(10)
+  id             Int     @id @default(autoincrement()) @map("course_id")
+  shortTitle     String? @map("short_title") @db.VarChar(100)
+  title          String? @db.VarChar(100)
+  units          Int     @default(12)
+
+  @@index([courseNum], map: "course_num")
+  @@index([courseSection], map: "course_section")
+  @@index([department], map: "department")
+  @@index([departmentCode], map: "department_code")
+  @@index([title], map: "title")
+  @@map("courses")
+}
+
+model DegreeStatus {
+  date        DateTime?    @db.Date
+  id          Int          @id @default(autoincrement()) @map("ds_id")
+  status      String?      @db.VarChar(100)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([status], map: "status")
+  @@index([student_id], map: "student_id")
+  @@map("degree_status")
+}
+
+model DepartmentMeeting {
+  department String  @db.VarChar(20)
+  id         Int     @id @default(autoincrement()) @map("meeting_id")
+  name       String? @db.VarChar(150)
+
+  @@map("department_meetings")
+}
+
+model DepartmentSignature {
+  department String @db.VarChar(20)
+  id         Int    @id @default(autoincrement()) @map("dsig_id") @db.UnsignedInt
+  sigblock   String @db.Text
+
+  @@map("department_signature")
+}
+
+model DepartmentSignatureImage {
+  displayOrder  Int      @map("display_order") @db.UnsignedInt
+  dsigId        Int      @map("dsig_id") @db.UnsignedInt
+  fileDate      DateTime @map("file_date") @db.DateTime(0)
+  fileName      String?  @map("file_name") @db.VarChar(50)
+  fileSize      Int?     @map("file_size") @db.UnsignedInt
+  fileType      String?  @map("file_type") @db.VarChar(50)
+  id            Int      @id @default(autoincrement()) @map("sigimage_id") @db.UnsignedInt
+  signatureName String   @map("signature_name") @db.VarChar(100)
+
+  @@index([dsigId], map: "FK_department_sigimage_signature")
+  @@map("department_signature_image")
+}
+
+model DocumentTemplatePart {
+  advisorHide  Int?    @default(0) @map("advisor_hide") @db.TinyInt
+  defaultText  String? @map("default_text") @db.Text
+  id           Int     @id @unique(map: "ltp_id") @default(autoincrement()) @map("template_part_id") @db.UnsignedInt
+  keepWithNext Int     @default(0) @map("keep_with_next") @db.UnsignedTinyInt
+  partOrder    Int     @map("part_order") @db.UnsignedInt
+  templateId   Int     @map("template_id") @db.UnsignedInt
+  typeField    String  @default("free") @map("type") @db.VarChar(50)
+
+  @@unique([templateId, partOrder], map: "part_order")
+  @@index([id], map: "ltp_id_2")
+  @@map("document_template_parts")
+}
+
+model DocumentTemplate {
+  department      String  @db.VarChar(50)
+  description     String? @db.Text
+  documentType    String  @map("document_type") @db.VarChar(50)
+  id              Int     @id @unique(map: "lt_id") @default(autoincrement()) @map("template_id") @db.UnsignedInt
+  identifier      String? @db.VarChar(50)
+  performanceCode String? @map("performance_code") @db.Char(10)
+  shortDesc       String? @map("short_desc") @db.VarChar(50)
+  sortOrder       Int     @map("sort_order")
+
+  @@index([id], map: "lt_id_2")
+  @@map("document_templates")
+}
+
+model Employment {
+  address1    String?      @db.VarChar(100)
+  address2    String?      @db.VarChar(100)
+  city        String?      @db.VarChar(100)
+  country     String?      @db.VarChar(100)
+  date        DateTime?    @db.Date
+  email       String?      @db.VarChar(100)
+  employer    String?      @db.VarChar(250)
+  id          Int          @id @default(autoincrement()) @map("employment_id")
+  phone       String?      @db.VarChar(100)
+  state       String?      @db.VarChar(100)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  typeField   String?      @map("type") @db.VarChar(50)
+  zip         String?      @db.VarChar(100)
+
+  @@index([student_id], map: "student_id")
+  @@map("employment")
+}
+
+model EvaluationLetter {
+  date            DateTime?                       @db.Date
+  documentId      Int?                            @map("document_id") @db.UnsignedInt
+  id              Int                             @id @default(autoincrement()) @map("letter_id")
+  performanceCode String?                         @map("performance_code") @db.Char(8)
+  status          EnumEvaluationLetterStatus
+  studentData     StudentDatum                    @relation(fields: [student_id], references: [id])
+  student_id      Int
+  student_read    EnumEvaluationLetterStudentRead @default(No)
+  text            String                          @db.Text
+
+  @@unique([student_id, date], map: "DateConstraint")
+  @@index([date], map: "date")
+  @@index([student_id], map: "student_id")
+  @@map("evaluation_letters")
+}
+
+model Evaluator {
+  facultyId Int @map("faculty_id") @db.UnsignedInt
+  id        Int @id @default(autoincrement()) @map("ev_id") @db.UnsignedInt
+  studentId Int @map("student_id") @db.UnsignedInt
+
+  @@index([facultyId], map: "faculty_id")
+  @@index([studentId], map: "student_id")
+  @@map("evaluators")
+}
+
+model EventSchedule {
+  always     Int?      @default(0) @db.UnsignedTinyInt
+  canceled   Int?      @default(0) @db.UnsignedTinyInt
+  department String    @db.Char(10)
+  endDate    DateTime? @map("end_date") @db.Date
+  eventType  String    @map("event_type") @db.Char(50)
+  id         Int       @id @unique(map: "event_id") @default(autoincrement()) @map("event_id") @db.UnsignedInt
+  startDate  DateTime? @map("start_date") @db.Date
+
+  @@index([id, department], map: "event_id_2")
+  @@map("event_schedule")
+}
+
+model ExpNeuroReq {
+  complete       Boolean?     @default(true)
+  date           DateTime     @db.Date
+  departmentCode String?      @map("department_code") @db.VarChar(3)
+  id             Int          @id @default(autoincrement()) @map("en_id")
+  pending        Boolean?     @default(false)
+  studentData    StudentDatum @relation(fields: [student_id], references: [id])
+  student_id     Int
+
+  @@index([student_id], map: "student_id")
+  @@map("exp_neuro_req")
+}
+
+model FacultyCert {
+  category  String   @db.VarChar(50)
+  certDate  DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @map("cert_date") @db.DateTime(0)
+  facultyId Int      @map("faculty_id")
+  id        Int      @id @default(autoincrement()) @map("fc_id")
+  refId     Int      @map("ref_id")
+
+  @@map("faculty_cert")
+}
+
+model FacultyDatum {
+  department      String? @db.VarChar(100)
+  id              Int     @id @default(autoincrement()) @map("faculty_id") @db.UnsignedInt
+  institutesId    String? @map("institutes_id") @db.VarChar(20)
+  institutesName  String? @map("institutes_name") @db.VarChar(100)
+  institution     String? @db.VarChar(100)
+  institutionAbbr String? @map("institution_abbr") @db.VarChar(100)
+  status          String? @db.VarChar(50)
+  title           String? @db.VarChar(100)
+  urId            Int?    @map("ur_id") @db.UnsignedInt
+
+  @@index([urId], map: "ur_id")
+  @@map("faculty_data")
+}
+
+model FellowshipTitle {
+  department      String @default("0") @db.VarChar(10)
+  fellowshipTitle String @default("0") @map("fellowship_title") @db.VarChar(200)
+  id              Int    @id @default(autoincrement()) @map("ftitle_id")
+
+  @@map("fellowship_titles")
+}
+
+model Fellowship {
+  amount         Float?       @default(0) @db.Float
+  amountSemester Float?       @default(0) @map("amount_semester") @db.Float
+  beginDate      DateTime?    @map("begin_date") @db.Date
+  duration       String?      @default("0") @db.VarChar(100)
+  endDate        String?      @map("end_date") @db.VarChar(50)
+  id             Int          @id @default(autoincrement()) @map("fellowship_id") @db.UnsignedInt
+  pending        Boolean?     @default(false)
+  studentData    StudentDatum @relation(fields: [student_id], references: [id])
+  student_id     Int
+  title          String?      @db.VarChar(250)
+
+  @@index([id], map: "fellowship_id")
+  @@index([student_id], map: "student_id")
+  @@map("fellowships")
+}
+
+model FileAccessLog {
+  facultyId Int?      @map("faculty_id")
+  id        Int       @id @default(autoincrement()) @map("al_id")
+  sfId      Int?      @map("sf_id")
+  time      DateTime? @db.DateTime(0)
+
+  @@index([facultyId], map: "faculty_id")
+  @@index([sfId], map: "sf_id")
+  @@map("file_access_log")
+}
+
+model Funding {
+  fundingDate String?      @map("funding_date") @db.VarChar(50)
+  id          Int          @id @default(autoincrement()) @map("funding_id") @db.UnsignedInt
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  title       String?      @db.VarChar(250)
+
+  @@index([id], map: "funding_id")
+  @@index([student_id], map: "student_id")
+  @@map("funding")
+}
+
+model GeneralDatum {
+  date        DateTime?    @db.Date
+  date2       DateTime?    @map("date_2") @db.Date
+  id          Int          @id @default(autoincrement()) @map("gt_id") @db.UnsignedInt
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  text        String?      @db.Text
+  val         String?      @db.VarChar(100)
+  val2        String?      @map("val_2") @db.VarChar(100)
+
+  @@index([student_id], map: "student_id")
+  @@map("general_data")
+}
+
+model GreGeneralConv {
+  currentScale Int    @default(0) @map("current_scale")
+  id           Int    @id @default(autoincrement())
+  priorScale   Int    @default(0) @map("prior_scale")
+  subject      String @default("verbal") @db.VarChar(12)
+
+  @@map("gre_general_conv")
+}
+
+model Icc {
+  date      DateTime @db.DateTime(0)
+  id        Int      @id @default(autoincrement())
+  score     Int
+  studentId Int      @map("student_id") @db.UnsignedInt
+
+  @@map("icc")
+}
+
+model Institute {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(200)
+
+  @@map("institutes")
+}
+
+model Institution {
+  city             String? @db.VarChar(100)
+  code             String? @db.VarChar(50)
+  country          String? @db.VarChar(100)
+  countryCode      String? @map("country_code") @db.VarChar(5)
+  id               Int     @id @default(autoincrement()) @map("institution_id")
+  institution      String? @db.VarChar(200)
+  institutionAbbr  String? @map("institution_abbr") @db.VarChar(200)
+  institutionAscii String? @map("institution_ascii") @db.VarChar(200)
+  state            String? @db.VarChar(5)
+  url              String? @db.VarChar(200)
+
+  @@map("institutions")
+}
+
+model InstitutionsConsol {
+  city             String? @db.VarChar(100)
+  code             String? @db.VarChar(50)
+  country          String? @db.VarChar(100)
+  countryCode      String? @map("country_code") @db.VarChar(5)
+  id               Int     @id @default(autoincrement()) @map("institution_id")
+  institution      String? @db.VarChar(200)
+  institutionAbbr  String? @map("institution_abbr") @db.VarChar(200)
+  institutionAscii String? @map("institution_ascii") @db.VarChar(200)
+  state            String? @db.VarChar(5)
+  url              String? @db.VarChar(200)
+
+  @@map("institutions_consol")
+}
+
+model Internship {
+  company     String?      @db.VarChar(100)
+  endDate     DateTime?    @map("end_date") @db.DateTime(0)
+  id          Int          @id @default(autoincrement()) @map("internship_id") @db.UnsignedInt
+  pending     Boolean?     @default(false)
+  startDate   DateTime?    @map("start_date") @db.DateTime(0)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "student_id")
+  @@map("internships")
+}
+
+model InternshipsCd {
+  city            String?      @db.VarChar(100)
+  company         String?      @db.VarChar(100)
+  companyUrl      String?      @map("company_url") @db.VarChar(150)
+  endDate         DateTime?    @map("end_date") @db.DateTime(0)
+  id              Int          @id @default(autoincrement()) @map("internship_id") @db.UnsignedInt
+  pending         Boolean?     @default(false)
+  startDate       DateTime?    @map("start_date") @db.DateTime(0)
+  state           String?      @db.VarChar(100)
+  studentData     StudentDatum @relation(fields: [student_id], references: [id])
+  student_id      Int
+  supervisorEmail String?      @map("supervisor_email") @db.VarChar(150)
+  supervisorName  String?      @map("supervisor_name") @db.VarChar(150)
+  supervisorPhone String?      @map("supervisor_phone") @db.VarChar(150)
+
+  @@index([student_id], map: "student_id")
+  @@map("internships_cds")
+}
+
+model InternshipsIni {
+  city        String?      @db.VarChar(100)
+  company     String?      @db.VarChar(100)
+  endDate     DateTime?    @map("end_date") @db.DateTime(0)
+  id          Int          @id @default(autoincrement()) @map("internship_id") @db.UnsignedInt
+  pending     Boolean?     @default(false)
+  position    String?      @db.VarChar(100)
+  startDate   DateTime?    @map("start_date") @db.DateTime(0)
+  state       String?      @db.VarChar(100)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "student_id")
+  @@map("internships_ini")
+}
+
+model InternshipsIsrm {
+  city            String?      @db.VarChar(100)
+  company         String?      @db.VarChar(100)
+  companyUrl      String?      @map("company_url") @db.VarChar(150)
+  endDate         DateTime?    @map("end_date") @db.DateTime(0)
+  id              Int          @id @default(autoincrement()) @map("internship_id") @db.UnsignedInt
+  pending         Boolean?     @default(false)
+  position        String?      @db.VarChar(150)
+  startDate       DateTime?    @map("start_date") @db.DateTime(0)
+  state           String?      @db.VarChar(100)
+  studentData     StudentDatum @relation(fields: [student_id], references: [id])
+  student_id      Int
+  supervisorEmail String?      @map("supervisor_email") @db.VarChar(150)
+  supervisorName  String?      @map("supervisor_name") @db.VarChar(150)
+  supervisorPhone String?      @map("supervisor_phone") @db.VarChar(150)
+
+  @@index([student_id], map: "student_id")
+  @@map("internships_isrms")
+}
+
+model Interview {
+  date        DateTime?    @db.Date
+  employer    String?      @db.VarChar(250)
+  id          Int          @id @default(autoincrement()) @map("interview_id")
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  typeField   String?      @map("type") @db.VarChar(50)
+
+  @@index([student_id], map: "student_id")
+  @@map("interview")
+}
+
+model Ita {
+  date        DateTime     @db.Date
+  id          Int          @id @default(autoincrement()) @map("ita_id")
+  score       String       @db.VarChar(20)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "student_id")
+  @@map("ita")
+}
+
+model Leadership {
+  id              Int       @id @default(autoincrement())
+  leadershipOther String?   @map("leadership_other") @db.VarChar(50)
+  startDate       DateTime? @map("start_date") @db.Date
+  studentId       Int       @map("student_id")
+  title           String?   @db.VarChar(50)
+
+  @@map("leadership")
+}
+
+model LegacyRequirement {
+  course           String?      @db.Text
+  id               Int          @id @default(autoincrement()) @map("lr_id") @db.UnsignedInt
+  requirementTitle String?      @map("requirement_title") @db.VarChar(50)
+  requirementType  String?      @map("requirement_type") @db.VarChar(10)
+  studentData      StudentDatum @relation(fields: [student_id], references: [id])
+  student_id       Int
+
+  @@index([student_id], map: "student_id")
+  @@map("legacy_requirements")
+}
+
+model MeetingAgendum {
+  id           Int @id @default(autoincrement()) @map("ma_id")
+  meetingId    Int @map("meeting_id")
+  presentOrder Int @map("present_order")
+  studentId    Int @map("student_id")
+
+  @@unique([meetingId, presentOrder], map: "meeting_id")
+  @@map("meeting_agenda")
+}
+
+model MeetingParameter {
+  id        Int     @id @default(autoincrement()) @map("mp_id")
+  meetingId Int     @map("meeting_id")
+  param     String  @db.VarChar(20)
+  sortOrder Int?    @default(-1) @map("sort_order")
+  typeField String  @map("type") @db.VarChar(10)
+  value     String? @db.VarChar(50)
+
+  @@map("meeting_parameters")
+}
+
+model Meeting {
+  adminVisible     Boolean? @map("admin_visible")
+  department       String   @db.VarChar(10)
+  end              DateTime @db.DateTime(0)
+  facultyVisible   Boolean? @map("faculty_visible")
+  id               Int      @id @default(autoincrement()) @map("meeting_id")
+  longDescription  String?  @map("long_description") @db.VarChar(250)
+  shortDescription String?  @map("short_description") @db.VarChar(50)
+  start            DateTime @db.DateTime(0)
+
+  @@map("meetings")
+}
+
+model NewCourseDepartment {
+  courseId        Int     @map("course_id") @db.UnsignedInt
+  id              Int     @id @default(autoincrement()) @map("cd_id") @db.UnsignedInt
+  requirementType String? @map("requirement_type") @db.VarChar(20)
+
+  @@index([courseId], map: "course_id")
+  @@map("new_course_department")
+}
+
+model NewCourse {
+  courseNum      String? @map("course_num") @db.VarChar(10)
+  courseSection  String? @map("course_section") @db.VarChar(10)
+  department     String? @db.VarChar(20)
+  departmentCode String? @map("department_code") @db.VarChar(10)
+  id             Int     @id @default(autoincrement()) @map("course_id")
+  shortTitle     String? @map("short_title") @db.VarChar(100)
+  title          String? @db.VarChar(100)
+  units          Int     @default(12)
+
+  @@index([courseNum], map: "course_num")
+  @@index([courseSection], map: "course_section")
+  @@index([department], map: "department")
+  @@index([departmentCode], map: "department_code")
+  @@index([title], map: "title")
+  @@map("new_courses")
+}
+
+model Note {
+  date        DateTime         @db.Date
+  id          Int              @id @default(autoincrement()) @map("note_id")
+  note_type   EnumNoteNoteType
+  studentData StudentDatum     @relation(fields: [student_id], references: [id])
+  student_id  Int
+  text        String           @db.Text
+
+  @@index([note_type], map: "note_type")
+  @@index([student_id], map: "student_id")
+  @@map("notes")
+}
+
+model Practicum {
+  date        DateTime?    @db.Date
+  id          Int          @id @default(autoincrement()) @map("prac_id") @db.UnsignedInt
+  pracType    String?      @map("prac_type") @db.VarChar(50)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  title       String?      @db.VarChar(250)
+
+  @@index([id], map: "prac_id")
+  @@index([student_id], map: "student_id")
+  @@map("practicum")
+}
+
+model Presentation {
+  date        DateTime?    @db.DateTime(0)
+  id          Int          @id @default(autoincrement()) @map("present_id")
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "student_id")
+  @@map("presentations")
+}
+
+model ProgramStatus {
+  date        DateTime?    @db.Date
+  id          Int          @id @default(autoincrement()) @map("ps_id")
+  status      String?      @db.VarChar(100)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([status], map: "status")
+  @@index([student_id], map: "student_id")
+  @@map("program_status")
+}
+
+model ProjectTopic {
+  area        String?      @db.VarChar(100)
+  clientName  String?      @map("client_name") @db.VarChar(250)
+  date        DateTime?    @db.Date
+  id          Int          @id @default(autoincrement()) @map("pt_id")
+  notes       String?      @db.VarChar(250)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  teamName    String?      @map("team_name") @db.VarChar(250)
+  title       String?      @db.VarChar(250)
+
+  @@index([student_id], map: "student_id")
+  @@map("project_topic")
+}
+
+model PsyProjectReq {
+  complete  Boolean?
+  date      DateTime @db.Date
+  id        Int      @id @default(autoincrement()) @map("pp_id")
+  pending   Boolean?
+  studentId Int      @map("student_id") @db.UnsignedInt
+  title     String   @db.VarChar(255)
+
+  @@map("psy_project_req")
+}
+
+model QualsCommittee {
+  id                           Int                            @id @unique(map: "qc_id") @default(autoincrement()) @map("qc_id") @db.UnsignedInt
+  memberType                   String?                        @map("member_type") @db.VarChar(50)
+  overrideResearch             Int?                           @map("override_research") @db.TinyInt
+  overrideSpeaking             Int?                           @map("override_speaking") @db.TinyInt
+  overrideWriting              Int?                           @map("override_writing") @db.TinyInt
+  qualsResearch                QualsResearch[]
+  qualsResearchForOtherStudent QualsResearchForOtherStudent[]
+  qualsWriting                 QualsWriting[]
+  studentData                  StudentDatum                   @relation(fields: [student_id], references: [id])
+  student_id                   Int
+  urId                         Int                            @map("ur_id") @db.UnsignedInt
+
+  @@index([id], map: "qc_id_2")
+  @@index([student_id], map: "student_id")
+  @@map("quals_committee")
+}
+
+model QualsResearch {
+  approach          EnumQualsResearchApproach?
+  approachExp       String?                          @map("approach_exp") @db.Text
+  id                Int                              @id @default(autoincrement()) @map("quals_research_id")
+  insight           EnumQualsResearchInsight?
+  insightExp        String?                          @map("insight_exp") @db.Text
+  interpretation    EnumQualsResearchInterpretation?
+  interpretationExp String?                          @map("interpretation_exp") @db.Text
+  overall           EnumQualsResearchOverall?
+  overallExp        String?                          @map("overall_exp") @db.Text
+  progress          String?                          @db.Text
+  qualsCommittee    QualsCommittee?                  @relation(fields: [qc_id], references: [id])
+  qc_id             Int?
+  status            EnumQualsResearchStatus?
+  studentId         Int?                             @map("student_id")
+  summary           String?                          @db.Text
+  timestamp         DateTime?                        @default(now()) @db.Timestamp(0)
+  understanding     EnumQualsResearchUnderstanding?
+  understandingExp  String?                          @map("understanding_exp") @db.Text
+  urId              Int?                             @map("ur_id")
+
+  @@index([qc_id], map: "FK_quals_research_quals_committee")
+  @@map("quals_research")
+}
+
+model QualsResearchForOtherStudent {
+  approach          EnumQualsResearchForOtherStudentApproach?
+  approachExp       String?                                         @map("approach_exp") @db.Text
+  id                Int                                             @id @default(autoincrement()) @map("quals_research_id")
+  insight           EnumQualsResearchForOtherStudentInsight?
+  insightExp        String?                                         @map("insight_exp") @db.Text
+  interpretation    EnumQualsResearchForOtherStudentInterpretation?
+  interpretationExp String?                                         @map("interpretation_exp") @db.Text
+  overall           EnumQualsResearchForOtherStudentOverall?
+  overallExp        String?                                         @map("overall_exp") @db.Text
+  progress          String?                                         @db.Text
+  qualsCommittee    QualsCommittee?                                 @relation(fields: [qc_id], references: [id])
+  qc_id             Int?
+  status            EnumQualsResearchForOtherStudentStatus?
+  studentId         Int?                                            @map("student_id")
+  summary           String?                                         @db.Text
+  timestamp         DateTime?                                       @default(now()) @db.Timestamp(0)
+  understanding     EnumQualsResearchForOtherStudentUnderstanding?
+  understandingExp  String?                                         @map("understanding_exp") @db.Text
+  urId              Int?                                            @map("ur_id")
+
+  @@index([qc_id], map: "FK_quals_research_quals_committee")
+  @@map("quals_research_for_other_student")
+}
+
+model QualsSpeaking {
+  av_quality          EnumQualsSpeakingAvQuality?
+  avQualityExp        String?                         @map("av_quality_exp") @db.Text
+  id                  Int                             @id @default(autoincrement()) @map("quals_speaking_id")
+  interaction         EnumQualsSpeakingInteraction?
+  interactionExp      String?                         @map("interaction_exp") @db.Text
+  organization        EnumQualsSpeakingOrganization?
+  organizationExp     String?                         @map("organization_exp") @db.Text
+  overall             EnumQualsSpeakingOverall?
+  overallExp          String?                         @map("overall_exp") @db.Text
+  qcId                Int?                            @map("qc_id") @db.UnsignedInt
+  qualsSpeakingAspect QualsSpeakingAspect[]
+  speaking_skill      EnumQualsSpeakingSpeakingSkill?
+  speakingSkillExp    String?                         @map("speaking_skill_exp") @db.Text
+  status              EnumQualsSpeakingStatus?
+  studentId           Int?                            @map("student_id")
+  summary             String?                         @db.Text
+  timestamp           DateTime?                       @default(now()) @db.Timestamp(0)
+  understanding       EnumQualsSpeakingUnderstanding?
+  understandingExp    String?                         @map("understanding_exp") @db.Text
+  urId                Int?                            @map("ur_id")
+
+  @@index([qcId], map: "FK_speaking_qual_quals_committee")
+  @@map("quals_speaking")
+}
+
+model QualsSpeakingAspect {
+  id                Int                          @id @default(autoincrement()) @map("quals_speaking_aspect_id")
+  qualsSpeaking     QualsSpeaking?               @relation(fields: [quals_speaking_id], references: [id])
+  quals_speaking_id Int?
+  text              String?                      @db.Text
+  type              EnumQualsSpeakingAspectType?
+
+  @@index([quals_speaking_id], map: "FK_speaking_qual_aspect_speaking_qual")
+  @@map("quals_speaking_aspect")
+}
+
+model QualsWriting {
+  engaging_reader    EnumQualsWritingEngagingReader?
+  engagingReaderExp  String?                         @map("engaging_reader_exp") @db.Text
+  id                 Int                             @id @default(autoincrement()) @map("quals_writing_id")
+  organization       EnumQualsWritingOrganization?
+  organizationExp    String?                         @map("organization_exp") @db.Text
+  overall            EnumQualsWritingOverall?
+  overallExp         String?                         @map("overall_exp") @db.Text
+  qualsCommittee     QualsCommittee?                 @relation(fields: [qc_id], references: [id])
+  qc_id              Int?
+  qualsWritingAspect QualsWritingAspect[]
+  status             EnumQualsWritingStatus?
+  studentId          Int?                            @map("student_id")
+  summaryAudience    String?                         @map("summary_audience") @db.Text
+  summaryTopic       String?                         @map("summary_topic") @db.Text
+  timestamp          DateTime?                       @default(now()) @db.Timestamp(0)
+  urId               Int?                            @map("ur_id")
+  writing_style      EnumQualsWritingWritingStyle?
+  writingStyleExp    String?                         @map("writing_style_exp") @db.Text
+
+  @@index([qc_id], map: "FK_writing_qual_quals_committee")
+  @@map("quals_writing")
+}
+
+model QualsWritingAspect {
+  id               Int                         @id @default(autoincrement()) @map("quals_writing_aspect_id")
+  qualsWriting     QualsWriting?               @relation(fields: [quals_writing_id], references: [id])
+  quals_writing_id Int?
+  text             String?                     @db.Text
+  type             EnumQualsWritingAspectType?
+
+  @@index([quals_writing_id], map: "FK_quals_writing_aspect_quals_writing")
+  @@map("quals_writing_aspect")
+}
+
+model RawDatum {
+  advisor         String? @db.Text
+  ai              String? @db.Text
+  alg             String? @db.Text
+  comments        String? @db.Text
+  csys            String? @db.Text
+  el              String? @db.Text
+  finish          String? @db.VarChar(100)
+  fullRecord      String? @map("full_record") @db.Text
+  id              Int     @id @default(autoincrement())
+  leftProgram     String? @db.VarChar(100)
+  name            String? @db.VarChar(200)
+  notes           String? @db.Text
+  pl              String? @db.Text
+  programmingReq  String? @db.VarChar(100)
+  qualdone        String? @db.VarChar(100)
+  sex             String? @db.VarChar(10)
+  speakingReq     String? @db.VarChar(100)
+  ss              String? @db.Text
+  startSem        String? @db.VarChar(20)
+  startYear       Int?
+  startYearFull   String? @map("startYear_full") @db.VarChar(6)
+  teachingReq     String? @db.Text
+  thesisCommittee String? @db.Text
+  thesisProposal  String? @db.Text
+  thesisTitle     String? @db.Text
+  undergrad       String? @db.VarChar(100)
+  writingReq      String? @db.VarChar(100)
+  year            Float?  @db.Float
+  yearFull        String? @map("year_full") @db.VarChar(10)
+
+  @@map("raw_data")
+}
+
+model RawDataLetter {
+  id                  Int     @id @default(autoincrement())
+  introText           String? @map("intro_text") @db.Text
+  month               String? @db.VarChar(100)
+  name                String? @db.VarChar(100)
+  performanceCode     String? @map("performance_code") @db.Text
+  performanceCodeText String? @map("performance_code_text") @db.Text
+  text                String? @db.Text
+  year                Int?
+
+  @@map("raw_data_letter")
+}
+
+model ReportColumn {
+  columnFormat   String? @default("") @map("column_format") @db.VarChar(20)
+  columnName     String? @map("column_name") @db.TinyText
+  columnSortable Int     @default(1) @map("column_sortable") @db.TinyInt
+  columnTitle    String? @map("column_title") @db.TinyText
+  id             Int     @id @default(autoincrement()) @map("rc_id") @db.UnsignedInt
+  reports        Report  @relation(fields: [report_id], references: [id])
+  report_id      Int
+  sortOrder      Int?    @map("sort_order") @db.UnsignedInt
+
+  @@index([report_id], map: "rc_report")
+  @@map("report_columns")
+}
+
+model ReportDeptVisibility {
+  department String @default("0") @db.VarChar(50)
+  id         Int    @id @default(autoincrement()) @map("rdv_id") @db.UnsignedInt
+  reports    Report @relation(fields: [report_id], references: [id])
+  report_id  Int
+  visible    Int    @default(0) @db.UnsignedTinyInt
+
+  @@unique([report_id, department], map: "UNQ_rdv")
+  @@index([report_id], map: "FK_report_dept_visibility_reports")
+  @@map("report_dept_visibility")
+}
+
+model Report {
+  id                   Int                    @id @default(autoincrement()) @map("report_id") @db.UnsignedInt
+  reportColumns        ReportColumn[]
+  reportDeptVisibility ReportDeptVisibility[]
+  reportQuery          String?                @map("report_query") @db.MediumText
+  reportTitle          String?                @map("report_title") @db.Text
+
+  @@map("reports")
+}
+
+model ResponsibleConductOfResearch {
+  completionDate DateTime @map("completion_date") @db.Date
+  description    String?  @db.VarChar(1024)
+  id             Int      @id @default(autoincrement()) @map("rcr_id")
+  studentId      Int      @map("student_id")
+
+  @@index([studentId], map: "Index 2")
+  @@map("responsible_conduct_of_research")
+}
+
+model ReviewPeriodReference {
+  id        Int    @id @default(autoincrement()) @map("rpref_id")
+  refAbbrev String @map("ref_abbrev") @db.VarChar(10)
+  refDay    Int    @map("ref_day")
+  refMonth  Int    @map("ref_month")
+  refName   String @map("ref_name") @db.VarChar(50)
+
+  @@map("review_period_reference")
+}
+
+model Rotation {
+  comment     String?      @db.Text
+  endDate     DateTime?    @map("end_date") @db.Date
+  facultyId   Int          @map("faculty_id") @db.UnsignedInt
+  id          Int          @id @default(autoincrement()) @map("rotation_id") @db.UnsignedInt
+  sfId        Int?         @map("sf_id") @db.UnsignedInt
+  startDate   DateTime?    @map("start_date") @db.Date
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([id], map: "rotation_id")
+  @@index([student_id], map: "student_id")
+  @@map("rotations")
+}
+
+model ScheduledMeeting {
+  agendaId      Int      @map("agenda_id")
+  alwaysVisible Boolean  @default(false) @map("always_visible")
+  department    String   @db.Char(20)
+  endDate       DateTime @map("end_date") @db.DateTime(0)
+  id            Int      @id @default(autoincrement()) @map("schedmeet_id")
+  startDate     DateTime @map("start_date") @db.DateTime(0)
+
+  @@map("scheduled_meetings")
+}
+
+model SemesterDateOverride {
+  department String @db.VarChar(50)
+  id         Int    @id @default(autoincrement()) @map("sdover_id")
+  semrefId   Int    @map("semref_id")
+  year       Int
+
+  @@map("semester_date_overrides")
+}
+
+model SemesterDate {
+  department String @default("0") @db.VarChar(10)
+  disabled   Int    @default(0) @db.TinyInt
+  id         Int    @id @default(autoincrement()) @map("sdate_id")
+  semrefId   Int    @default(0) @map("semref_id")
+  startDay   Int    @default(0) @map("start_day") @db.TinyInt
+  startMonth Int    @default(0) @map("start_month") @db.TinyInt
+
+  @@map("semester_dates")
+}
+
+model SemesterReference {
+  id        Int    @id @default(autoincrement()) @map("semref_id")
+  optional  Int    @default(0) @db.TinyInt
+  refAbbrev String @default("0") @map("ref_abbrev") @db.VarChar(5)
+  refDay    Int    @default(0) @map("ref_day")
+  refMonth  Int    @default(0) @map("ref_month")
+  refName   String @default("0") @map("ref_name") @db.VarChar(50)
+  rprefId   Int    @default(0) @map("rpref_id")
+
+  @@map("semester_reference")
+}
+
+model Statement {
+  createdDate  DateTime            @default(now()) @db.DateTime(0)
+  date         DateTime            @db.Date
+  documentId   Int?                @map("document_id") @db.UnsignedInt
+  id           Int                 @id @default(autoincrement()) @map("statement_id")
+  modifiedDate DateTime            @default(now()) @db.DateTime(0)
+  status       EnumStatementStatus
+  studentData  StudentDatum        @relation(fields: [student_id], references: [id])
+  student_id   Int
+  text         String              @db.LongText
+  textAll      String?             @db.LongText
+
+  @@unique([student_id, date], map: "DateConstraint")
+  @@map("statements")
+}
+
+model StudentAdvisor {
+  consultant  Boolean      @default(false)
+  current     Boolean      @default(false)
+  endDate     DateTime     @default(dbgenerated("'9999-09-09'")) @map("end_date") @db.Date
+  facultyId   Int          @map("faculty_id") @db.UnsignedInt
+  id          Int          @id @default(autoincrement()) @map("advisor_id") @db.UnsignedInt
+  startDate   DateTime?    @map("start_date") @db.Date
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "FK_student_advisors_student_data")
+  @@map("student_advisors")
+}
+
+model StudentApp {
+  appId       Int          @map("app_id")
+  id          String       @id @default(cuid()) @db.VarChar(250)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id, appId], map: "student_id_app_id")
+  @@map("student_apps")
+}
+
+model StudentCommitteeMeeting {
+  id          Int      @id @default(autoincrement()) @map("committtee_meeting_id")
+  meetingDate DateTime @map("meeting_date") @db.Date
+  studentId   Int      @map("student_id")
+
+  @@map("student_committee_meetings")
+}
+
+model StudentCourse {
+  applicable      String    @db.VarChar(10)
+  courseNum       String?   @map("course_num") @db.VarChar(10)
+  courseSection   String?   @map("course_section") @db.VarChar(5)
+  customLabel     String?   @map("custom_label") @db.VarChar(50)
+  date            DateTime? @db.Date
+  departmentCode  String?   @map("department_code") @db.VarChar(10)
+  grade           String?   @db.VarChar(10)
+  id              Int       @id @default(autoincrement()) @map("course_id")
+  midtermGrade    String?   @map("midterm_grade") @db.VarChar(10)
+  note            String?   @db.VarChar(200)
+  qpoints         Float?    @db.Float
+  requirementType String    @map("requirement_type") @db.VarChar(50)
+  shortTitle      String?   @map("short_title") @db.VarChar(100)
+  studentId       Int?      @map("student_id")
+  title           String?   @db.Text
+  transfercredit  Int?      @db.TinyInt
+  units           String?   @db.VarChar(10)
+
+  @@index([studentId], map: "student_id")
+  @@map("student_courses")
+}
+
+model StudentDatum {
+  advisors           Advisor[]
+  area               String?             @db.VarChar(30)
+  areas              Area[]
+  awards             Award[]
+  citizenship        String?             @db.VarChar(100)
+  committeeService   CommitteeService[]
+  curriculum         String?             @db.VarChar(50)
+  degree             String?             @db.VarChar(20)
+  degreeStatus       DegreeStatus[]
+  department         String?             @db.VarChar(20)
+  employment         Employment[]
+  enterDate          DateTime?           @map("enter_date") @db.Date
+  evaluationLetters  EvaluationLetter[]
+  expNeuroReq        ExpNeuroReq[]
+  fellowships        Fellowship[]
+  funding            Funding[]
+  gender             String?             @db.Char(1)
+  generalData        GeneralDatum[]
+  guid               String?             @db.VarChar(150)
+  id                 Int                 @id @default(autoincrement()) @map("student_id") @db.UnsignedInt
+  institutesId       String?             @map("institutes_id") @db.VarChar(50)
+  institutesName     String?             @map("institutes_name") @db.VarChar(100)
+  internships        Internship[]
+  internshipsCds     InternshipsCd[]
+  internshipsIni     InternshipsIni[]
+  internshipsIsrms   InternshipsIsrm[]
+  interview          Interview[]
+  ita                Ita[]
+  legacyRequirements LegacyRequirement[]
+  mltSwitch          Boolean?            @map("mlt_switch")
+  notes              Note[]
+  parttime           Int?
+  practicum          Practicum[]
+  presentations      Presentation[]
+  program            String?             @db.VarChar(30)
+  programStatus      ProgramStatus[]
+  projectTopic       ProjectTopic[]
+  qualsCommittee     QualsCommittee[]
+  residency          String?             @db.VarChar(100)
+  rotations          Rotation[]
+  statements         Statement[]
+  status             String?             @db.VarChar(20)
+  statusDate         DateTime?           @map("status_date") @db.Date
+  studentAdvisors    StudentAdvisor[]
+  studentApps        StudentApp[]
+  studentDataHcii    StudentDataHcii[]
+  studentDataIni     StudentDataIni[]
+  studentDataMl      StudentDataMl[]
+  studentDataRi      StudentDataRi?
+  studentFiles       StudentFile[]
+  studentInstitutes  StudentInstitute[]
+  studentMentors     StudentMentor[]
+  studentOverrides   StudentOverride[]
+  studentPubs        StudentPub[]
+  studentResidency   StudentResidency[]
+  studentSkills      StudentSkill[]
+  teachingReq        TeachingReq[]
+  thesisCommittee    ThesisCommittee[]
+  thesisTopic        ThesisTopic[]
+  undergrad          String?             @db.VarChar(100)
+  userRole           UserRole?           @relation(fields: [ur_id], references: [id])
+  ur_id              Int?
+  year               Float?              @db.Float
+  yearAdjust         String?             @default("0") @map("year_adjust") @db.VarChar(100)
+
+  @@index([status], map: "status")
+  @@index([ur_id], map: "ut_id")
+  @@map("student_data")
+}
+
+model StudentDataHcii {
+  id          String       @id @default(cuid()) @db.VarChar(250)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  uploadDate  DateTime?    @map("upload_date") @db.Date
+
+  @@index([student_id], map: "sdHciiStudentId")
+  @@map("student_data_hcii")
+}
+
+model StudentDataIni {
+  curriculumOption String?      @map("curriculum_option") @db.VarChar(100)
+  curriculumTrack  String?      @map("curriculum_track") @db.VarChar(100)
+  id               String       @id @default(cuid()) @db.VarChar(250)
+  programDuration  Int?         @map("program_duration") @db.UnsignedInt
+  studentData      StudentDatum @relation(fields: [student_id], references: [id])
+  student_id       Int
+
+  @@index([student_id], map: "student_id")
+  @@map("student_data_ini")
+}
+
+model StudentDataMl {
+  id                String       @id @default(cuid()) @db.VarChar(250)
+  origDepartment    String?      @map("orig_department") @db.VarChar(50)
+  overrideCore      Boolean?     @map("override_core")
+  overrideElectives Boolean?     @map("override_electives")
+  studentData       StudentDatum @relation(fields: [student_id], references: [id])
+  student_id        Int
+
+  @@index([student_id], map: "student_id")
+  @@map("student_data_ml")
+}
+
+model StudentDataRi {
+  id           String       @id @default(cuid()) @db.VarChar(250)
+  overrideCore Int?         @map("override_core") @db.UnsignedTinyInt
+  overrideSpec Int?         @map("override_spec") @db.UnsignedTinyInt
+  studentData  StudentDatum @relation(fields: [student_id], references: [id])
+  student_id   Int          @unique
+
+  @@index([student_id], map: "student_id_2")
+  @@map("student_data_ri")
+}
+
+model StudentDocumentPart {
+  documentId     Int     @map("document_id") @db.UnsignedInt
+  id             Int     @id @unique(map: "sdp_id") @default(autoincrement()) @map("sdp_id") @db.UnsignedInt
+  isDefault      Int?    @map("is_default") @db.UnsignedTinyInt
+  templatePartId Int     @map("template_part_id") @db.UnsignedInt
+  text           String? @db.Text
+
+  @@index([id], map: "sdp_id_2")
+  @@map("student_document_parts")
+}
+
+model StudentDocument {
+  id         Int @id @unique(map: "sd_id") @default(autoincrement()) @map("document_id") @db.UnsignedInt
+  templateId Int @map("template_id") @db.UnsignedInt
+
+  @@index([id], map: "sd_id_2")
+  @@map("student_documents")
+}
+
+model StudentFile {
+  fileChanges Int          @default(0) @map("file_changes") @db.TinyInt
+  fileDate    DateTime?    @map("file_date") @db.Date
+  fileDesc    String?      @map("file_desc") @db.VarChar(100)
+  fileName    String?      @map("file_name") @db.VarChar(200)
+  fileType    String?      @map("file_type") @db.VarChar(50)
+  id          Int          @id @default(autoincrement()) @map("sf_id") @db.UnsignedInt
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([id], map: "sf_id")
+  @@index([student_id], map: "sf_students")
+  @@map("student_files")
+}
+
+model StudentInstitute {
+  degree         String?      @db.VarChar(50)
+  id             Int          @id @default(autoincrement()) @map("si_id") @db.UnsignedInt
+  institutesAbbr String?      @map("institutes_abbr") @db.VarChar(150)
+  institutesId   String?      @map("institutes_id") @db.VarChar(150)
+  institutesName String?      @map("institutes_name") @db.VarChar(150)
+  institutesText String?      @map("institutes_text") @db.VarChar(150)
+  irank          Int?         @db.UnsignedTinyInt
+  major          String?      @db.VarChar(100)
+  studentData    StudentDatum @relation(fields: [student_id], references: [id])
+  student_id     Int
+
+  @@index([institutesId], map: "institutes_id")
+  @@index([student_id], map: "si_students")
+  @@map("student_institutes")
+}
+
+model StudentMentor {
+  consultant  Int          @default(0) @db.TinyInt
+  current     Int          @default(0) @db.TinyInt
+  endDate     DateTime?    @default(dbgenerated("'9999-09-09'")) @map("end_date") @db.Date
+  facultyId   Int          @map("faculty_id") @db.UnsignedInt
+  id          Int          @id @default(autoincrement()) @map("mentor_id") @db.UnsignedInt
+  startDate   DateTime?    @map("start_date") @db.Date
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "FK_student_mentors_student_data")
+  @@map("student_mentors")
+}
+
+model StudentOverride {
+  id          Int          @id @default(autoincrement()) @map("so_id")
+  noteId      Int?         @map("note_id")
+  requirement String       @db.VarChar(50)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+
+  @@index([student_id], map: "so_students")
+  @@map("student_overrides")
+}
+
+model StudentPub {
+  authors     String?      @db.VarChar(255)
+  citation    String?      @db.VarChar(255)
+  forum       String?      @db.VarChar(255)
+  id          Int          @id @default(autoincrement()) @map("sp_id") @db.UnsignedInt
+  pubDate     DateTime?    @map("pub_date") @db.Date
+  sfId        Int?         @map("sf_id") @db.UnsignedInt
+  status      String?      @db.VarChar(255)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  title       String?      @db.VarChar(255)
+  url         String?      @db.VarChar(255)
+
+  @@index([student_id], map: "sp_students")
+  @@map("student_pubs")
+}
+
+model StudentResidency {
+  id            Int          @id @default(autoincrement()) @map("sres_id") @db.UnsignedInt
+  residencyDate DateTime     @default(dbgenerated("'0000-00-00 00:00:00'")) @map("residency_date") @db.DateTime(0)
+  studentData   StudentDatum @relation(fields: [student_id], references: [id])
+  student_id    Int
+
+  @@index([id], map: "prac_id")
+  @@index([student_id], map: "student_id")
+  @@map("student_residency")
+}
+
+model StudentSkill {
+  collab      String?      @db.VarChar(255)
+  comment     String?      @db.VarChar(255)
+  date        DateTime?    @db.Date
+  grade       String?      @db.VarChar(10)
+  id          Int          @id @default(autoincrement()) @map("skill_id")
+  pending     Boolean?     @default(false)
+  skill       String?      @db.VarChar(20)
+  studentData StudentDatum @relation(fields: [student_id], references: [id])
+  student_id  Int
+  title       String?      @db.VarChar(255)
+  units       Int          @default(1)
+
+  @@index([student_id], map: "student_id")
+  @@map("student_skills")
+}
+
+model TeachingReq {
+  complete       Boolean?     @default(true)
+  courseNum      String?      @map("course_num") @db.VarChar(10)
+  courseSection  String?      @map("course_section") @db.VarChar(10)
+  date           DateTime     @db.Date
+  departmentCode String?      @map("department_code") @db.VarChar(3)
+  id             Int          @id @default(autoincrement()) @map("tr_id")
+  pending        Boolean?     @default(false)
+  status         String?      @db.VarChar(10)
+  studentData    StudentDatum @relation(fields: [student_id], references: [id])
+  student_id     Int
+  title          String?      @db.VarChar(100)
+  units          String?      @db.VarChar(10)
+
+  @@index([student_id], map: "student_id")
+  @@map("teaching_req")
+}
+
+model ThesisCommittee {
+  committeeRole String?      @map("committee_role") @db.VarChar(30)
+  facultyId     Int?         @map("faculty_id")
+  id            Int          @id @default(autoincrement()) @map("tc_id")
+  pending       Boolean?     @default(false)
+  studentData   StudentDatum @relation(fields: [student_id], references: [id])
+  student_id    Int
+  thesisType    String       @default("PhD") @map("thesis_type") @db.VarChar(30)
+
+  @@index([facultyId], map: "faculty_id")
+  @@index([student_id], map: "student_id")
+  @@map("thesis_committee")
+}
+
+model ThesisTopic {
+  date             DateTime?    @db.Date
+  defenseComplete  Boolean?     @default(false) @map("defense_complete")
+  defenseDate      DateTime     @map("defense_date") @db.Date
+  defensePending   Boolean?     @default(false) @map("defense_pending")
+  defenseTitle     String       @map("defense_title") @db.VarChar(250)
+  id               Int          @id @default(autoincrement()) @map("tt_id")
+  pending          Boolean?     @default(false)
+  proposalComplete Boolean?     @default(false) @map("proposal_complete")
+  studentData      StudentDatum @relation(fields: [student_id], references: [id])
+  student_id       Int
+  title            String?      @db.VarChar(250)
+
+  @@index([student_id], map: "student_id")
+  @@map("thesis_topic")
+}
+
+model UserAccess {
+  access Boolean? @default(false)
+  id     Int      @id @default(autoincrement()) @map("ua_id") @db.UnsignedInt
+  userId Int?     @map("user_id") @db.UnsignedInt
+
+  @@index([access], map: "access")
+  @@index([userId], map: "user_id")
+  @@map("user_access")
+}
+
+model UserHost {
+  host     String @db.VarChar(150)
+  id       Int    @id @default(autoincrement()) @map("shu_id")
+  username String @db.VarChar(150)
+
+  @@map("user_host")
+}
+
+model UserRole {
+  access      Int?           @db.UnsignedTinyInt
+  defaultRole Int?           @map("default_role") @db.UnsignedTinyInt
+  department  String?        @db.VarChar(10)
+  hideName    Int?           @default(0) @map("hide_name") @db.UnsignedTinyInt
+  id          Int            @id @default(autoincrement()) @map("ur_id") @db.UnsignedInt
+  roleId      String?        @map("role_id") @db.VarChar(20)
+  studentData StudentDatum[]
+  users       User?          @relation(fields: [user_id], references: [id])
+  user_id     Int?
+
+  @@index([department], map: "department")
+  @@index([roleId(length: 1)], map: "role_id")
+  @@index([user_id], map: "user_id")
+  @@map("user_role")
+}
+
+model UserRoleLookup {
+  id     String @id @default(cuid()) @db.VarChar(250)
+  role   String @db.VarChar(20)
+  roleId Int    @default(0) @map("role_id") @db.UnsignedInt
+
+  @@index([roleId], map: "role_id")
+  @@map("user_role_lookup")
+}
+
+model UserRoleProgram {
+  id      Int    @id @default(autoincrement()) @map("urp_id")
+  program String @default("0") @db.VarChar(50)
+  urId    Int    @map("ur_id")
+
+  @@map("user_role_program")
+}
+
+model User {
+  andrewId     String?    @map("andrew_id") @db.VarChar(150)
+  email        String?    @db.VarChar(150)
+  firstName    String?    @map("first_name") @db.VarChar(100)
+  id           Int        @id @default(autoincrement()) @map("user_id") @db.UnsignedInt
+  lastName     String?    @map("last_name") @db.VarChar(100)
+  middleName   String?    @map("middle_name") @db.VarChar(100)
+  nickname     String?    @db.VarChar(100)
+  owner        String?    @db.VarChar(15)
+  ownerDisplay String?    @map("owner_display") @db.VarChar(15)
+  username     String?    @db.VarChar(150)
+  userRole     UserRole[]
+
+  @@map("users")
+}
+
+model UsersOverride {
+  department String? @db.VarChar(15)
+  email      String? @db.VarChar(150)
+  firstName  String? @map("first_name") @db.VarChar(100)
+  id         Int     @id @default(autoincrement()) @db.UnsignedInt
+  lastName   String? @map("last_name") @db.VarChar(100)
+  middleName String? @map("middle_name") @db.VarChar(100)
+  nickname   String? @db.VarChar(100)
+  urId       Int?    @map("ur_id")
+  userId     Int?    @map("user_id")
+  username   String? @db.VarChar(150)
+
+  @@map("users_override")
+}
+
+enum EnumEvaluationLetterStatus {
+  Draft
+  Completed
+  Edited
+  Finalized
+  Approved
+}
+
+enum EnumEvaluationLetterStudentRead {
+  Yes
+  No
+}
+
+enum EnumNoteNoteType {
+  admin_notes
+  faculty_notes
+  general_notes
+  private_notes
+}
+
+enum EnumQualsResearchApproach {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchInsight {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchInterpretation {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchOverall {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchStatus {
+  Satisfied
+  Progress
+}
+
+enum EnumQualsResearchUnderstanding {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchForOtherStudentApproach {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchForOtherStudentInsight {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchForOtherStudentInterpretation {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchForOtherStudentOverall {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsResearchForOtherStudentStatus {
+  Satisfied
+  Progress
+}
+
+enum EnumQualsResearchForOtherStudentUnderstanding {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingAvQuality {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingInteraction {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingOrganization {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingOverall {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingSpeakingSkill {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingStatus {
+  Satisfied
+  Progress
+}
+
+enum EnumQualsSpeakingUnderstanding {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsSpeakingAspectType {
+  strength
+  weakness
+}
+
+enum EnumQualsWritingEngagingReader {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsWritingOrganization {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsWritingOverall {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsWritingStatus {
+  Satisfied
+  Progress
+}
+
+enum EnumQualsWritingWritingStyle {
+  Excellent
+  Good
+  Satisfactory
+  Unsatisfactory
+}
+
+enum EnumQualsWritingAspectType {
+  strength
+  weakness
+}
+
+enum EnumStatementStatus {
+  Draft
+  Completed
+}
